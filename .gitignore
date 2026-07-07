@@ -1,0 +1,28 @@
+# Ambientes virtuais
+pycache__/.venv/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Dados grandes / bases locais
+bronze/*.csv
+silver/*.csv
+gold/*.csv
+dados/*.csv
+
+# Arquivos temporários
+evalu*tion_check.json
+exp_analysis_check*json
+.venv-1/
+
+# Python cache

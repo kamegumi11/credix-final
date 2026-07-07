@@ -1,0 +1,38 @@
+{
+  "auc": 0.7118215566555474,
+  "precision": 0.5,
+  "recall": 0.0006042296072507553,
+  "f1": 0.0012070006035003018,
+  "confusion_matrix": [
+    [
+      56535,
+      3
+    ],
+    [
+      4962,
+      3
+    ]
+  ],
+  "threshold": 0.5,
+  "features": [
+    "AMT_INCOME_TOTAL",
+    "AMT_CREDIT",
+    "AMT_ANNUITY",
+    "AMT_GOODS_PRICE",
+    "IDADE",
+    "TEMPO_EMPRESA",
+    "CREDITO_RENDA",
+    "PARCELA_RENDA",
+    "BEM_RENDA",
+    "RENDA_LIVRE",
+    "COMPROMETIMENTO_RENDA",
+    "PRAZO_ESTIMADO",
+    "BUREAU_QTD_CREDITOS",
+    "BUREAU_QTD_ATIVOS",
+    "BUREAU_TOTAL_CREDITO",
+    "BUREAU_TOTAL_DIVIDA",
+    "BUREAU_DEBT_RATIO",
+    "NAME_EDUCATION_TYPE",
+    "NAME_FAMILY_STATUS"
+  ]
+}
