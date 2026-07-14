@@ -86,15 +86,16 @@ def main():
     X_test_t = preprocessor.transform(X_test)
 
     model = XGBClassifier(
-        n_estimators=300,
-        max_depth=4,
-        learning_rate=0.05,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        objective="binary:logistic",
-        eval_metric="auc",
-        random_state=42,
-        n_jobs=-1,
+    n_estimators=300,
+    max_depth=4,
+    learning_rate=0.05,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    objective="binary:logistic",
+    eval_metric="auc",
+    random_state=42,
+    n_jobs=-1,
+    scale_pos_weight=12
     )
 
     print("Treinando modelo XGBoost...")
@@ -109,7 +110,7 @@ def main():
         "recall": float(recall_score(y_test, pred, zero_division=0)),
         "f1": float(f1_score(y_test, pred, zero_division=0)),
         "confusion_matrix": confusion_matrix(y_test, pred).tolist(),
-        "threshold": 0.5,
+        "threshold": 0.08,
         "features": features,
     }
 
