@@ -888,7 +888,7 @@ A documentação Swagger pode ser acessada em:
 http://localhost:8000/docs
 ```
 
-### Executar aplicação Streamlit
+### Executar aplicação Streamlit (Novo Terminal se utilizado VSCode)
 
 ```bash
 streamlit run streamlit/app.py
