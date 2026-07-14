@@ -343,16 +343,13 @@ O pré-processamento e o modelo são armazenados em um único objeto `Pipeline` 
 
 Dessa forma, as mesmas transformações utilizadas durante o treinamento são aplicadas automaticamente durante as previsões realizadas pela API.
 
-O modelo treinado é armazenado em:
+Os artefatos gerados durante o treinamento são armazenados em:
 
 ```text
-models/xgboost_model.pkl
-```
-
-As métricas de avaliação são armazenadas em:
-
-```text
-reports/evaluation_metrics.json
+assets/modelo.pkl
+assets/preprocessor.pkl
+assets/feature_names.json
+assets/metrics.json
 ```
 
 Os indicadores de monitoramento de drift são armazenados em:
