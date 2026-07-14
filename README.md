@@ -31,6 +31,27 @@ O projeto contempla as principais etapas do ciclo de vida de Machine Learning:
 ---
 ## 1.1 Estrutura do Projeto (Etapa em Grupo + Etapa Individual)
 
+### Estrutura Atual do Repositório
+
+```text
+airflow/
+api/
+assets/
+dados/
+datapipeline/
+mlops/
+model/
+models/
+monitoring/
+notebooks/
+reports/
+streamlit/
+
+README.md
+docker-compose.yml
+requirements.txt
+```
+
 O projeto Credix foi desenvolvido em duas etapas complementares.
 
 ### Etapa em Grupo
@@ -146,23 +167,29 @@ A FastAPI disponibiliza o modelo como um serviço REST de predição.
 O Docker Compose gerencia os containers e permite executar os componentes da solução de forma integrada.
 
 ---
+
 ## 5. Pipeline de Dados
 
 O pipeline de dados é responsável pela preparação das informações utilizadas pelo modelo.
 
-As etapas são executadas sequencialmente:
+A estrutura atual do projeto contém scripts para construção da base analítica (ABT) a partir dos dados do Home Credit.
+
+As etapas principais são:
 
 ```text
-01_application_features.py
-              │
-              ▼
-02_bureau_features.py
-              │
-              ▼
-merge_abt.py
-              │
-              ▼
-Dados/abt.csv
+application_train.csv
+            │
+            ▼
+datapipeline/application_features.py
+            │
+            ▼
+datapipeline/bureau_features.py
+            │
+            ▼
+datapipeline/generate_abt.py
+            │
+            ▼
+ABT utilizada no treinamento
 ```
 
 ### 5.1 Application Features
@@ -170,7 +197,7 @@ Dados/abt.csv
 O arquivo:
 
 ```text
-DataPipeline/01_application_features.py
+datapipeline/application_features.py
 ```
 
 é responsável pelo tratamento das informações cadastrais e financeiras da base de solicitações.
@@ -188,7 +215,7 @@ As principais atividades são:
 O arquivo:
 
 ```text
-DataPipeline/02_bureau_features.py
+datapipeline/bureau_features.py
 ```
 
 é responsável pela agregação das informações do histórico de crédito.
@@ -206,18 +233,12 @@ São calculadas informações como:
 O arquivo:
 
 ```text
-DataPipeline/merge_abt.py
+datapipeline/generate_abt.py
 ```
 
 realiza a integração das informações cadastrais e das informações do Bureau.
 
-O resultado é armazenado em:
-
-```text
-Dados/abt.csv
-```
-
-A ABT representa a base analítica utilizada no treinamento do modelo.
+A ABT gerada é utilizada como base para o treinamento dos modelos de Machine Learning.
 
 ---
 
@@ -274,17 +295,17 @@ BUREAU_DEBT_RATIO
 O problema foi tratado como uma tarefa de **classificação binária**.
 
 Durante a etapa de experimentação, foram avaliados diferentes algoritmos de classificação, incluindo:
-- Regressão Logística;
-- Random Forest;
-- XGBoost.
-- 
+- Regressão Logística
+- Random Forest
+- XGBoost
+
 Os modelos foram comparados utilizando métricas adequadas ao contexto de risco de crédito, considerando principalmente:
 
-- Recall;
-- Precision;
-- F1-score;
-- ROC AUC;
-- capacidade de identificação da classe inadimplente.
+- Recall
+- Precision
+- F1-score
+- ROC AUC
+- capacidade de identificação da classe inadimplente
 
 A acurácia não foi utilizada isoladamente como critério de seleção, pois o conjunto de dados apresenta desbalanceamento entre clientes inadimplentes e não inadimplentes. 
 Nesse cenário, um modelo poderia obter uma acurácia elevada ao classificar a maioria dos clientes como não inadimplentes, mas apresentar baixa capacidade de identificar os clientes que realmente representam risco.
@@ -325,13 +346,19 @@ Dessa forma, as mesmas transformações utilizadas durante o treinamento são ap
 O modelo treinado é armazenado em:
 
 ```text
-models/best_model.pkl
+models/xgboost_model.pkl
 ```
 
-As métricas são armazenadas em:
+As métricas de avaliação são armazenadas em:
 
 ```text
-metrics/train_metrics.json
+reports/evaluation_metrics.json
+```
+
+Os indicadores de monitoramento de drift são armazenados em:
+
+```text
+reports/psi_report.csv
 ```
 
 ---
@@ -420,7 +447,7 @@ Avaliação da necessidade de retreinamento
 ## 10. API de Predição
 
 O modelo é disponibilizado por meio de uma API REST desenvolvida com FastAPI.
-A ideia é que nossos clientes consultem modelo atraves da API.
+A ideia é que os clientes consultem o modelo por meio da API.
 
 A API utiliza:
 
@@ -473,10 +500,9 @@ Exemplo de resposta:
 ```
 
 ---
-
 ## 11. Orquestração com Apache Airflow
 
-O Apache Airflow é utilizado para executar e monitorar o pipeline.
+O Apache Airflow é utilizado para executar e monitorar o pipeline de Machine Learning.
 
 A interface pode ser acessada em:
 
@@ -484,7 +510,7 @@ A interface pode ser acessada em:
 http://localhost:8080
 ```
 
-A DAG executa o seguinte fluxo:
+A DAG executa o seguinte fluxo lógico:
 
 ```text
 Início
@@ -499,35 +525,39 @@ Bureau Features
 Construção da ABT
    │
    ▼
-Treinamento do XGBoost
+Treinamento do Modelo
    │
    ▼
-Cálculo das métricas
+Avaliação
    │
    ▼
-Persistência do modelo
+Persistência do Modelo
    │
    ▼
 Fim
 ```
 
-O arquivo:
+O projeto contém o arquivo:
 
 ```text
-pipeline_orchestration.py
+mlops/pipeline_orchestration.py
 ```
 
-executa sequencialmente:
+que representa a orquestração simplificada das principais etapas do pipeline.
 
-```python
-DataPipeline/01_application_features.py
+As etapas contempladas incluem:
 
-DataPipeline/02_bureau_features.py
+```text
+datapipeline/application_features.py
 
-DataPipeline/merge_abt.py
+datapipeline/bureau_features.py
 
-Model/train.py
+datapipeline/generate_abt.py
+
+model/train.py
 ```
+
+---
 
 ## 12. Infraestrutura com Docker Compose
 
@@ -811,37 +841,93 @@ As principais evoluções planejadas são:
 
 ## 18. Como Executar
 
-### Criar ambiente
+### Criar ambiente virtual
 
+```bash
 python -m venv .venv
+```
 
-### Ativar ambiente
+### Ativar ambiente virtual
 
+```bash
 .venv\Scripts\activate
+```
 
 ### Instalar dependências
 
+```bash
 pip install -r requirements.txt
+```
 
-### Executar pipeline
+### Executar geração da base analítica
 
-python pipeline_orchestration.py
+```bash
+python datapipeline/application_features.py
+python datapipeline/bureau_features.py
+python datapipeline/generate_abt.py
+```
 
-### Executar API
+### Treinar modelo
 
+```bash
+python model/train.py
+```
+
+### Executar predição local
+
+```bash
+python model/predict.py
+```
+
+### Executar API FastAPI
+
+```bash
 uvicorn api.app:app --reload
+```
 
-### Executar Streamlit
+A documentação Swagger pode ser acessada em:
 
-streamlit run app/app.py
+```text
+http://localhost:8000/docs
+```
 
-#### Executar com Docker Compose
+### Executar aplicação Streamlit
 
+```bash
+streamlit run streamlit/app.py
+```
+
+### Executar orquestração simplificada
+
+```bash
+python mlops/pipeline_orchestration.py
+```
+
+### Executar infraestrutura completa
+
+```bash
 docker-compose up --build
+```
 
 ---
+## 19. Notebooks e Relatórios
 
-## 19. Considerações Finais
+O projeto também disponibiliza os notebooks de análise exploratória e avaliação do modelo:
+
+```text
+notebooks/exp_analysis.ipynb
+notebooks/evaluation.ipynb
+```
+
+Os relatórios, métricas, figuras e análises de monitoramento estão disponíveis em:
+
+```text
+reports/
+reports/figures/
+```
+
+---
+## 20. Considerações Finais
 
 O Credix demonstra uma arquitetura funcional de Machine Learning que integra:
 
