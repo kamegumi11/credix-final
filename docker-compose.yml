@@ -23,11 +23,11 @@ services:
       - api
     restart: unless-stopped
 
-  airflow:
+  airflow-webserver:
     build:
       context: .
       dockerfile: airflow/Dockerfile
-    container_name: credix-airflow
+    container_name: credix-airflow-webserver
     ports:
       - "8080:8080"
     environment:
@@ -48,6 +48,23 @@ services:
       --lastname Credix
       --role Admin
       --email admin@credix.com || true &&
-      airflow webserver & airflow scheduler
+      exec airflow webserver
       "
+    restart: unless-stopped
+
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: airflow/Dockerfile
+    container_name: credix-airflow-scheduler
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__EXECUTOR: "SequentialExecutor"
+      AIRFLOW_UID: "50000"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - .:/opt/airflow/credix
+    command: airflow scheduler
+    depends_on:
+      - airflow-webserver
     restart: unless-stopped
