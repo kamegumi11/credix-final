@@ -68,3 +68,12 @@ services:
     depends_on:
       - airflow-webserver
     restart: unless-stopped
+
+  minio:
+    image: minio/minio
+    container_name: credix-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+     
